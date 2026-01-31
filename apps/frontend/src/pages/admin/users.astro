@@ -1,0 +1,8 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import UsersList from '../../components/UsersList';
+---
+
+<DashboardLayout title="Użytkownicy" requiredRoles={['ADMINISTRATOR']}>
+  <UsersList client:load />
+</DashboardLayout>

@@ -1,0 +1,8 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import NewsManagement from '../components/NewsManagement';
+---
+
+<DashboardLayout title="Zarządzanie aktualnościami" requiredRoles={['TRENER', 'ADMINISTRATOR']}>
+  <NewsManagement client:load />
+</DashboardLayout>

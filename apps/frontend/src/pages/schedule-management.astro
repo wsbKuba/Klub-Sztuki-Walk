@@ -1,0 +1,8 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import ScheduleManagement from '../components/ScheduleManagement';
+---
+
+<DashboardLayout title="Zarządzanie grafikiem" requiredRoles={['TRENER', 'ADMINISTRATOR']}>
+  <ScheduleManagement client:load />
+</DashboardLayout>

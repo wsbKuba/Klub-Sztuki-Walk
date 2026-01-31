@@ -1,0 +1,171 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  requireAuth?: boolean;
+}
+
+const { title, requireAuth = false } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title} | Klub Sztuki Walki</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <nav class="nav">
+        <a href="/" class="logo">
+          <span class="logo-icon">🥊</span>
+          <span class="logo-text">Klub Sztuki Walki</span>
+        </a>
+
+        <div class="nav-links" id="nav-links">
+          <a href="/">Strona główna</a>
+          <a href="/login" class="nav-auth" id="nav-login">Zaloguj się</a>
+          <a href="/register" class="nav-auth" id="nav-register">Rejestracja</a>
+          <a href="/dashboard" class="nav-user" id="nav-dashboard" style="display:none;">Dashboard</a>
+          <button class="btn btn-outline btn-sm nav-user" id="nav-logout" style="display:none;">Wyloguj</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <slot />
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 Klub Sztuki Walki. Wszystkie prawa zastrzeżone.</p>
+    </div>
+  </footer>
+
+  <script define:vars={{ requireAuth }}>
+    // Sprawdź czy użytkownik jest zalogowany
+    function updateNav() {
+      const token = localStorage.getItem('accessToken');
+      const authLinks = document.querySelectorAll('.nav-auth');
+      const userLinks = document.querySelectorAll('.nav-user');
+
+      if (token) {
+        authLinks.forEach(link => link.style.display = 'none');
+        userLinks.forEach(link => link.style.display = 'inline-flex');
+      } else {
+        authLinks.forEach(link => link.style.display = 'inline-flex');
+        userLinks.forEach(link => link.style.display = 'none');
+      }
+    }
+
+    // Wylogowanie
+    document.getElementById('nav-logout')?.addEventListener('click', async () => {
+      const refreshToken = localStorage.getItem('refreshToken');
+      try {
+        await fetch('http://localhost:3000/auth/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken }),
+        });
+      } catch {}
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      window.location.href = '/login';
+    });
+
+    // Sprawdź auth przy ładowaniu
+    updateNav();
+
+    // Sprawdź czy strona wymaga autoryzacji
+    if (requireAuth && !localStorage.getItem('accessToken')) {
+      window.location.href = '/login';
+    }
+  </script>
+</body>
+</html>
+
+<style>
+  .header {
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md) 0;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .logo:hover {
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    font-size: 1.5rem;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+  }
+
+  .nav-links a {
+    color: var(--color-text);
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .main {
+    min-height: calc(100vh - 140px);
+    padding: var(--spacing-xl) 0;
+  }
+
+  .footer {
+    background-color: var(--color-secondary);
+    color: white;
+    padding: var(--spacing-lg) 0;
+    text-align: center;
+  }
+
+  .footer p {
+    margin: 0;
+    opacity: 0.8;
+  }
+
+  @media (max-width: 768px) {
+    .nav {
+      flex-direction: column;
+      gap: var(--spacing-md);
+    }
+
+    .nav-links {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+</style>

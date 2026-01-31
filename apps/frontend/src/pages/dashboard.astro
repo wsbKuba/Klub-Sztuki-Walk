@@ -1,0 +1,8 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import NewsList from '../components/NewsList';
+---
+
+<DashboardLayout title="Aktualności">
+  <NewsList client:load />
+</DashboardLayout>

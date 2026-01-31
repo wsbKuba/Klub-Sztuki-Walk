@@ -1,0 +1,169 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Strona główna">
+  <div class="container">
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Klub Sztuki Walki</h1>
+        <p class="hero-subtitle">Trenuj boks, kickboxing i MMA z najlepszymi trenerami</p>
+        <div class="hero-buttons">
+          <a href="/register" class="btn btn-primary btn-lg">Dołącz do nas</a>
+          <a href="/login" class="btn btn-outline btn-lg">Zaloguj się</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <h2 class="text-center">Co oferujemy</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🥊</div>
+          <h3>Boks</h3>
+          <p>Tradycyjny boks angielski. Nauka techniki ciosów, pracy nóg i taktyki walki.</p>
+          <span class="feature-price">150 PLN/miesiąc</span>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🦶</div>
+          <h3>Kickboxing</h3>
+          <p>Połączenie boksu z kopnięciami. Kompleksowy trening całego ciała.</p>
+          <span class="feature-price">180 PLN/miesiąc</span>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤼</div>
+          <h3>MMA</h3>
+          <p>Mixed Martial Arts - sztuki walki mieszane. Striking, wrestling i grappling.</p>
+          <span class="feature-price">200 PLN/miesiąc</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="cta-content">
+        <h2>Gotowy na wyzwanie?</h2>
+        <p>Zapisz się już dziś i rozpocznij swoją przygodę ze sztukami walki!</p>
+        <a href="/register" class="btn btn-primary btn-lg">Rozpocznij teraz</a>
+      </div>
+    </section>
+  </div>
+</MainLayout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: var(--spacing-2xl) 0;
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary-dark) 100%);
+    color: white;
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .hero-content {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .hero-subtitle {
+    font-size: var(--font-size-xl);
+    opacity: 0.9;
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .features {
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .features h2 {
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+  }
+
+  .feature-card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .feature-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .feature-card h3 {
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .feature-card p {
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .feature-price {
+    display: inline-block;
+    background-color: var(--color-primary);
+    color: white;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+  }
+
+  .cta {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+  }
+
+  .cta-content {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .cta h2 {
+    margin-bottom: var(--spacing-md);
+  }
+
+  .cta p {
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  @media (max-width: 768px) {
+    .hero h1 {
+      font-size: 2rem;
+    }
+
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

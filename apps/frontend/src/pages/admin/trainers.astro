@@ -1,0 +1,8 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import TrainersList from '../../components/TrainersList';
+---
+
+<DashboardLayout title="Zarządzanie trenerami" requiredRoles={['ADMINISTRATOR']}>
+  <TrainersList client:load />
+</DashboardLayout>

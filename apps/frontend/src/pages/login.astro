@@ -1,0 +1,43 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import LoginForm from '../components/LoginForm';
+---
+
+<MainLayout title="Logowanie">
+  <div class="container">
+    <div class="auth-container">
+      <div class="auth-card">
+        <h1>Zaloguj się</h1>
+        <p class="text-muted mb-3">Zaloguj się, aby uzyskać dostęp do kalendarza zajęć i zarządzać subskrypcjami.</p>
+        <LoginForm client:load />
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+  }
+
+  .auth-card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: var(--spacing-xl);
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .auth-card h1 {
+    text-align: center;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .auth-card p {
+    text-align: center;
+  }
+</style>

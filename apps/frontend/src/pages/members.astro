@@ -1,0 +1,8 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import MembersList from '../components/MembersList';
+---
+
+<DashboardLayout title="Członkowie klubu" requiredRoles={['TRENER', 'ADMINISTRATOR']}>
+  <MembersList client:load />
+</DashboardLayout>

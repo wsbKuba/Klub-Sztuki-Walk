@@ -1,0 +1,318 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  requiredRoles?: ('USER' | 'TRENER' | 'ADMINISTRATOR')[];
+}
+
+const { title, requiredRoles = [] } = Astro.props;
+const apiUrl = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
+---
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title} | Klub Sztuki Walki</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+  <div class="dashboard-container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="/dashboard" class="logo">
+          <span class="logo-icon">🥊</span>
+          <span class="logo-text">KSW</span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="/dashboard" class="nav-item">
+          <span class="nav-icon">📰</span>
+          <span>Aktualności</span>
+        </a>
+        <a href="/calendar" class="nav-item">
+          <span class="nav-icon">📅</span>
+          <span>Kalendarz</span>
+        </a>
+        <a href="/subscriptions" class="nav-item">
+          <span class="nav-icon">💳</span>
+          <span>Subskrypcje</span>
+        </a>
+        <a href="/payments" class="nav-item">
+          <span class="nav-icon">📜</span>
+          <span>Historia płatności</span>
+        </a>
+        <a href="/profile" class="nav-item">
+          <span class="nav-icon">👤</span>
+          <span>Profil</span>
+        </a>
+
+        <div class="nav-section trainer-section" id="trainer-section" style="display:none;">
+          <div class="nav-section-title">Trener</div>
+          <a href="/members" class="nav-item">
+            <span class="nav-icon">👥</span>
+            <span>Członkowie klubu</span>
+          </a>
+          <a href="/schedule-management" class="nav-item">
+            <span class="nav-icon">⏰</span>
+            <span>Zarządzaj grafikiem</span>
+          </a>
+          <a href="/news-management" class="nav-item">
+            <span class="nav-icon">✏️</span>
+            <span>Zarządzaj aktualnościami</span>
+          </a>
+        </div>
+
+        <div class="nav-section admin-section" id="admin-section" style="display:none;">
+          <div class="nav-section-title">Administrator</div>
+          <a href="/admin/trainers" class="nav-item">
+            <span class="nav-icon">👥</span>
+            <span>Trenerzy</span>
+          </a>
+          <a href="/admin/users" class="nav-item">
+            <span class="nav-icon">👤</span>
+            <span>Użytkownicy</span>
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-outline btn-sm" id="logout-btn" style="width:100%;">
+          Wyloguj
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="content-header">
+        <h1>{title}</h1>
+        <div class="user-info" id="user-info"></div>
+      </header>
+
+      <div class="content-body">
+        <slot />
+      </div>
+    </main>
+  </div>
+
+  <script define:vars={{ requiredRoles, apiUrl }}>
+    // Sprawdź autoryzację
+    function checkAuth() {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        window.location.href = '/login';
+        return null;
+      }
+
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+
+        // Sprawdź czy token nie wygasł
+        if (payload.exp && payload.exp * 1000 < Date.now()) {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          window.location.href = '/login';
+          return null;
+        }
+
+        // Sprawdź role
+        if (requiredRoles && requiredRoles.length > 0 && !requiredRoles.includes(payload.role)) {
+          window.location.href = '/dashboard';
+          return null;
+        }
+
+        return payload;
+      } catch {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
+        return null;
+      }
+    }
+
+    // Aktualizuj UI na podstawie roli
+    function updateUI(user) {
+      if (!user) return;
+
+      // Pokaż info o użytkowniku
+      const userInfo = document.getElementById('user-info');
+      if (userInfo) {
+        userInfo.innerHTML = `<span>${user.firstName || ''} ${user.lastName || ''}</span> <span class="badge badge-${user.role === 'ADMINISTRATOR' ? 'danger' : user.role === 'TRENER' ? 'warning' : 'primary'}">${user.role}</span>`;
+      }
+
+      // Pokaż sekcje dla trenerów
+      if (user.role === 'TRENER' || user.role === 'ADMINISTRATOR') {
+        document.getElementById('trainer-section')?.style.setProperty('display', 'block');
+      }
+
+      // Pokaż sekcje dla adminów
+      if (user.role === 'ADMINISTRATOR') {
+        document.getElementById('admin-section')?.style.setProperty('display', 'block');
+      }
+    }
+
+    // Wylogowanie
+    document.getElementById('logout-btn')?.addEventListener('click', async () => {
+      const refreshToken = localStorage.getItem('refreshToken');
+      try {
+        await fetch(`${apiUrl}/auth/logout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken }),
+        });
+      } catch {}
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      window.location.href = '/login';
+    });
+
+    // Inicjalizacja
+    const user = checkAuth();
+    updateUI(user);
+  </script>
+</body>
+</html>
+
+<style>
+  .dashboard-container {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    width: 250px;
+    background-color: var(--color-secondary);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+  }
+
+  .sidebar-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: white;
+    text-decoration: none;
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: var(--spacing-md);
+    overflow-y: auto;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    text-decoration: none;
+  }
+
+  .nav-icon {
+    font-size: 1.25rem;
+  }
+
+  .nav-section {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .nav-section-title {
+    font-size: var(--font-size-sm);
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-sm);
+    padding: 0 var(--spacing-md);
+  }
+
+  .sidebar-footer {
+    padding: var(--spacing-lg);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .sidebar-footer .btn-outline {
+    color: white;
+    border-color: rgba(255, 255, 255, 0.5);
+    transition: all 0.2s ease;
+  }
+
+  .sidebar-footer .btn-outline:hover {
+    background-color: white;
+    color: var(--color-secondary);
+    border-color: white;
+  }
+
+  .main-content {
+    flex: 1;
+    margin-left: 250px;
+    background-color: var(--color-background);
+    min-height: 100vh;
+  }
+
+  .content-header {
+    background-color: var(--color-surface);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .content-header h1 {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .content-body {
+    padding: var(--spacing-xl);
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .main-content {
+      margin-left: 0;
+    }
+  }
+</style>
