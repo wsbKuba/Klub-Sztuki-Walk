@@ -55,7 +55,7 @@ async function runSeed(dataSource: DataSource) {
     { name: 'MMA', description: 'Mixed Martial Arts.', monthlyPrice: 200 },
   ];
 
-  const createdTypes = [];
+  const createdTypes: any[] = [];
   for (const ct of classTypes) {
     let existing = await classTypeRepo.findOne({ where: { name: ct.name } });
     if (!existing) {
@@ -67,11 +67,11 @@ async function runSeed(dataSource: DataSource) {
 
   // 4. Harmonogram
   const schedules = [
-    { classTypeId: createdTypes[0].id, trainerId: trener.id, dayOfWeek: 1, startTime: '18:00', endTime: '19:30' },
-    { classTypeId: createdTypes[0].id, trainerId: trener.id, dayOfWeek: 3, startTime: '18:00', endTime: '19:30' },
-    { classTypeId: createdTypes[1].id, trainerId: trener.id, dayOfWeek: 2, startTime: '19:00', endTime: '20:30' },
-    { classTypeId: createdTypes[1].id, trainerId: trener.id, dayOfWeek: 4, startTime: '19:00', endTime: '20:30' },
-    { classTypeId: createdTypes[2].id, trainerId: trener.id, dayOfWeek: 5, startTime: '18:00', endTime: '20:00' },
+    { classTypeId: createdTypes[0]?.id, trainerId: trener?.id, dayOfWeek: 1, startTime: '18:00', endTime: '19:30' },
+    { classTypeId: createdTypes[0]?.id, trainerId: trener?.id, dayOfWeek: 3, startTime: '18:00', endTime: '19:30' },
+    { classTypeId: createdTypes[1]?.id, trainerId: trener?.id, dayOfWeek: 2, startTime: '19:00', endTime: '20:30' },
+    { classTypeId: createdTypes[1]?.id, trainerId: trener?.id, dayOfWeek: 4, startTime: '19:00', endTime: '20:30' },
+    { classTypeId: createdTypes[2]?.id, trainerId: trener?.id, dayOfWeek: 5, startTime: '18:00', endTime: '20:00' },
   ];
 
   for (const sch of schedules) {
