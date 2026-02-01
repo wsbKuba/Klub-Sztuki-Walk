@@ -48,11 +48,11 @@ async function runSeed(dataSource: DataSource) {
     trener = trenerExists;
   }
 
-  // 3. Typy zajęć
+  // 3. Typy zajęć z Price ID ze Stripe
   const classTypes = [
-    { name: 'Boks', description: 'Tradycyjny boks angielski.', monthlyPrice: 150 },
-    { name: 'Kickboxing', description: 'Połączenie boksu z kopnięciami.', monthlyPrice: 180 },
-    { name: 'MMA', description: 'Mixed Martial Arts.', monthlyPrice: 200 },
+    { name: 'Boks', description: 'Tradycyjny boks angielski.', monthlyPrice: 150, stripePriceId: 'price_1StTU8CXIchWN0YjY1dJ79cr' },
+    { name: 'Kickboxing', description: 'Połączenie boksu z kopnięciami.', monthlyPrice: 180, stripePriceId: 'price_1StTUTCXIchWN0YjFQms0NF9' },
+    { name: 'MMA', description: 'Mixed Martial Arts.', monthlyPrice: 200, stripePriceId: 'price_1StTUeCXIchWN0Yjr4R1PSnU' },
   ];
 
   const createdTypes: any[] = [];
@@ -61,6 +61,13 @@ async function runSeed(dataSource: DataSource) {
     if (!existing) {
       existing = await classTypeRepo.save(ct);
       console.log(`✅ Utworzono typ: ${ct.name}`);
+    } else {
+      // Zaktualizuj stripePriceId jeśli się zmienił
+      if (existing.stripePriceId !== ct.stripePriceId) {
+        await classTypeRepo.update(existing.id, { stripePriceId: ct.stripePriceId });
+        existing.stripePriceId = ct.stripePriceId;
+        console.log(`✅ Zaktualizowano stripePriceId dla: ${ct.name}`);
+      }
     }
     createdTypes.push(existing);
   }
